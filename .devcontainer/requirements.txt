@@ -7,3 +7,5 @@ matplotlib
 seaborn
 mlflow
 prophet
+ydata_profiling
+streamlit_pandas_profiling
