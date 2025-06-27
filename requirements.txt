@@ -1,0 +1,9 @@
+streamlit
+pandas
+numpy
+shap
+scikit-learn
+matplotlib
+seaborn
+mlflow
+prophet
