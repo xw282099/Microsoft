@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: #05070d;
+  color: #e6ebf5;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(0,229,255,.35); color: #fff; }
+
+/* Custom scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0e18; }
+::-webkit-scrollbar-thumb { background: #1d2538; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2a3550; }
+
+@layer components {
+  .panel {
+    @apply bg-bg-card border border-bg-line rounded-xl;
+  }
+  .panel-glow {
+    @apply bg-bg-card border border-bg-line rounded-xl shadow-glow;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-mono uppercase tracking-wider;
+  }
+  .chip-bull { @apply chip bg-risk-bull/10 text-risk-bull border border-risk-bull/30; }
+  .chip-bear { @apply chip bg-risk-bear/10 text-risk-bear border border-risk-bear/30; }
+  .chip-neutral { @apply chip bg-risk-neutral/10 text-risk-neutral border border-risk-neutral/30; }
+  .chip-ai { @apply chip bg-accent-ai/10 text-accent-ai border border-accent-ai/30; }
+  .chip-cyan { @apply chip bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30; }
+
+  .num-mono { @apply font-mono tabular-nums; }
+  .label-xs { @apply text-[10px] font-mono uppercase tracking-widest text-ink-dim; }
+  .h-card { @apply text-sm font-semibold tracking-wide text-ink; }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(29,37,56,.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(29,37,56,.5) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .scanline {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .scanline::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 60px;
+    background: linear-gradient(180deg, transparent, rgba(0,229,255,.06), transparent);
+    animation: scan 2.6s linear infinite;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all;
+  }
+  .btn-primary {
+    @apply btn bg-accent-cyan/15 text-accent-cyan border border-accent-cyan/40 hover:bg-accent-cyan/25;
+  }
+  .btn-ai {
+    @apply btn bg-accent-ai/15 text-accent-ai border border-accent-ai/40 hover:bg-accent-ai/25;
+  }
+  .btn-ghost {
+    @apply btn bg-bg-elev/40 text-ink border border-bg-line hover:bg-bg-elev;
+  }
+
+  .data-row {
+    @apply flex items-center justify-between py-1.5 border-b border-bg-line/60 last:border-0 text-sm;
+  }
+}
+
+/* Subtle radial glow used in hero */
+.bg-aurora {
+  background:
+    radial-gradient(800px 400px at 20% 0%, rgba(124,92,255,.18), transparent 60%),
+    radial-gradient(700px 500px at 80% 20%, rgba(0,229,255,.12), transparent 60%),
+    radial-gradient(700px 600px at 50% 100%, rgba(34,211,154,.08), transparent 60%);
+}
+
+/* Marquee container */
+.marquee {
+  display: flex; gap: 2rem; width: max-content;
+  animation: tickerSlide 40s linear infinite;
+}

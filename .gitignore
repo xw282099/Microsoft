@@ -192,3 +192,20 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# -----------------------------------------------------------------------------
+# Next.js platform (./platform)
+# -----------------------------------------------------------------------------
+platform/node_modules/
+platform/.next/
+platform/out/
+platform/.vercel/
+platform/.env*.local
+platform/npm-debug.log*
+platform/yarn-debug.log*
+platform/yarn-error.log*
+# Re-include source dirs that match the Python-template patterns above
+!platform/lib/
+!platform/lib/**
+!platform/build/
+!platform/build/**
