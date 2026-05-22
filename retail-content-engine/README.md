@@ -7,10 +7,14 @@
 
 ```
 retail-content-engine/
-├── requirements.txt          # pydantic / anthropic / python-dotenv / pandas
+├── requirements.txt          # pydantic / anthropic / fastapi / uvicorn / pandas
 ├── .env.example              # 预留 ANTHROPIC_API_KEY
+├── app.py                    # Web 应用入口（FastAPI 后端 + 前端页面）
 ├── main.py                   # 批处理入口（CSV → CSV + 进度日志）
 ├── config/context.json       # 营销上下文（season / current_trend / brand_voice）
+├── web/                      # 前端单页应用
+│   ├── index.html
+│   └── static/{style.css, app.js}
 ├── data/
 │   ├── examples.json         # Few-Shot 满分文案样本
 │   └── input_skus.csv        # 测试 SKU 数据
@@ -25,12 +29,25 @@ retail-content-engine/
 ```bash
 pip install -r requirements.txt
 cp .env.example .env          # 填入真实 ANTHROPIC_API_KEY
-python main.py                # 读 data/input_skus.csv → 写 data/output_contents.csv
 ```
 
-可选参数：
+### 方式一：Web 应用（推荐）
+
+带设计感的单页界面，填表即可生成三平台文案、一键复制。
 
 ```bash
+uvicorn app:app --reload      # 或 python app.py
+# 浏览器打开 http://127.0.0.1:8000
+```
+
+接口：
+- `GET /api/context` — 返回默认营销上下文
+- `POST /api/generate` — 入参商品信息+可选上下文，返回结构化 `ContentOutput`
+
+### 方式二：CLI 批处理
+
+```bash
+python main.py                # 读 data/input_skus.csv → 写 data/output_contents.csv
 python main.py --input data/input_skus.csv --output data/output_contents.csv
 ```
 
