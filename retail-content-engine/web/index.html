@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retail Content Engine · 零售内容引擎</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo-mark">RC</span>
+      <div class="brand-text">
+        <strong>Retail Content Engine</strong>
+        <small>AI 零售内容自动化引擎</small>
+      </div>
+    </div>
+    <a class="ghost-link" href="https://github.com/new" target="_blank" rel="noreferrer">
+      多平台 · 结构化输出 · 一键生成
+    </a>
+  </header>
+
+  <main class="layout">
+    <!-- 左：输入面板 -->
+    <section class="panel input-panel">
+      <div class="panel-head">
+        <h1>把一个 SKU<br /><span class="grad-text">变成全平台爆款文案</span></h1>
+        <p class="subtitle">填写商品信息，AI 同时产出小红书、抖音脚本与电商详情页，结构化、可直接投放。</p>
+      </div>
+
+      <form id="gen-form" class="form" autocomplete="off">
+        <div class="field-grid">
+          <label class="field span-2">
+            <span class="field-label">商品名称 <i>*</i></span>
+            <input name="product_name" placeholder="如：云感轻氧防晒衣" required />
+          </label>
+
+          <label class="field">
+            <span class="field-label">品类 <i>*</i></span>
+            <input name="category" placeholder="如：服饰" required />
+          </label>
+
+          <label class="field">
+            <span class="field-label">SKU 编号</span>
+            <input name="sku_id" placeholder="选填，如 WEB-001" />
+          </label>
+
+          <label class="field span-2">
+            <span class="field-label">目标受众 <i>*</i></span>
+            <input name="target_audience" placeholder="如：20-35 岁通勤女性" required />
+          </label>
+
+          <label class="field span-2">
+            <span class="field-label">卖点 / 功能特性 <i>*</i></span>
+            <input name="features" placeholder="多个卖点用「、」或「;」分隔，如 UPF50+、凉感、轻薄" required />
+            <small class="hint">用顿号或分号分隔多个卖点</small>
+          </label>
+        </div>
+
+        <details class="context-box">
+          <summary>营销上下文 <span class="chip">可调</span></summary>
+          <div class="field-grid">
+            <label class="field">
+              <span class="field-label">季节</span>
+              <input name="season" placeholder="加载中…" />
+            </label>
+            <label class="field">
+              <span class="field-label">流行趋势</span>
+              <input name="current_trend" placeholder="加载中…" />
+            </label>
+            <label class="field span-2">
+              <span class="field-label">品牌调性</span>
+              <input name="brand_voice" placeholder="加载中…" />
+            </label>
+          </div>
+        </details>
+
+        <button type="submit" class="cta" id="submit-btn">
+          <span class="cta-label">✨ 生成全平台文案</span>
+          <span class="spinner" hidden></span>
+        </button>
+        <p class="error-msg" id="error-msg" hidden></p>
+      </form>
+    </section>
+
+    <!-- 右：结果面板 -->
+    <section class="panel result-panel" id="result-panel">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-illus">🪄</div>
+        <h3>生成结果将在这里呈现</h3>
+        <p>三大平台文案卡片 · 一键复制 · 即取即用</p>
+      </div>
+
+      <div class="result-cards" id="result-cards" hidden>
+        <!-- 小红书 -->
+        <article class="card card-xhs">
+          <header class="card-head">
+            <span class="platform-tag tag-xhs">小红书</span>
+            <button class="copy-btn" data-copy="xhs">复制</button>
+          </header>
+          <h4 class="card-title" data-field="xhs_title"></h4>
+          <p class="card-body" data-field="xhs_content"></p>
+          <div class="tag-row" data-field="xhs_tags"></div>
+        </article>
+
+        <!-- 抖音 -->
+        <article class="card card-tt">
+          <header class="card-head">
+            <span class="platform-tag tag-tt">抖音脚本</span>
+            <button class="copy-btn" data-copy="tt">复制</button>
+          </header>
+          <div class="script-line">
+            <span class="script-label">钩子 · 前3秒</span>
+            <p data-field="tt_hook"></p>
+          </div>
+          <div class="script-line">
+            <span class="script-label">正文 · 讲解</span>
+            <p data-field="tt_body"></p>
+          </div>
+          <div class="script-line">
+            <span class="script-label">CTA · 行动呼吁</span>
+            <p data-field="tt_cta"></p>
+          </div>
+        </article>
+
+        <!-- 电商详情 -->
+        <article class="card card-ec">
+          <header class="card-head">
+            <span class="platform-tag tag-ec">电商详情页</span>
+            <button class="copy-btn" data-copy="ec">复制</button>
+          </header>
+          <ul class="bullet-list" data-field="ec_bullets"></ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Retail Content Engine · 由 Anthropic Claude 驱动 · 结构 100% 锁定
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
