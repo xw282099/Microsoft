@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -14,6 +16,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn import metrics
+
+import trading_review
 
 st.set_page_config(page_title="Microsoft Stock Dashboard 📈", layout="wide", page_icon="📊")
 st.sidebar.title("Microsoft Stock Explorer 💻")
@@ -32,7 +36,8 @@ def main():
             "2️⃣ Data Visualization",
             "3️⃣ Prediction",
             "4️⃣ Explainability",
-            "5️⃣ Hyperparameter Tuning"
+            "5️⃣ Hyperparameter Tuning",
+            "6️⃣ AI Trading Review 🤖"
         ]
     )
 
@@ -156,7 +161,7 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
         shap.plots.waterfall(shap_values[idx], show=False)
         st.pyplot(plt.gcf())
 
-    else:
+    elif page == "5️⃣ Hyperparameter Tuning":
         st.header("5️⃣ Hyperparameter Tuning & Tracking with MLflow")
         df2 = df.dropna().copy()
         features_ht = ["Open", "High", "Low", "Volume"]
@@ -181,6 +186,98 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
                 st.success(f"Experiment logged. R² = {r2_ht:.3f}")
 
         st.markdown("View your experiment results in the MLflow UI (http://localhost:5000) or on DagsHub.")
+
+    else:
+        trading_review_page()
+
+
+def trading_review_page():
+    st.header("6️⃣ AI Trading Review 🤖")
+    st.caption(
+        "机构级交易复盘与系统训练引擎 · 三模式：Live Trade Check / Daily Review / "
+        "Trading System Builder。上传 TradingView 截图、持仓或交易记录，提出你的问题。"
+    )
+
+    # --- API key resolution: env var first, then Streamlit secrets ---
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        try:
+            api_key = st.secrets["ANTHROPIC_API_KEY"]
+        except Exception:
+            api_key = None
+
+    client = trading_review.get_client(api_key)
+    if client is None:
+        st.warning(
+            "未检测到 ANTHROPIC_API_KEY。请设置环境变量 `ANTHROPIC_API_KEY`，"
+            "或在 `.streamlit/secrets.toml` 中添加 `ANTHROPIC_API_KEY = \"sk-ant-...\"`，"
+            "然后刷新页面。"
+        )
+        return
+
+    mode = st.selectbox("模式 Mode", list(trading_review.MODES.keys()))
+
+    col_a, col_b = st.columns([1, 1])
+    with col_a:
+        if st.button("🗑️ 清空对话 Clear chat"):
+            st.session_state.pop("tr_messages", None)
+            st.rerun()
+    with col_b:
+        st.caption(f"Model: `{trading_review.MODEL}` · adaptive thinking")
+
+    # Conversation history in the API message format.
+    if "tr_messages" not in st.session_state:
+        st.session_state.tr_messages = []
+
+    # Replay prior turns (text only — uploaded images are not re-rendered).
+    for msg in st.session_state.tr_messages:
+        with st.chat_message(msg["role"]):
+            if isinstance(msg["content"], str):
+                st.markdown(msg["content"])
+            else:
+                for block in msg["content"]:
+                    if block.get("type") == "text":
+                        st.markdown(block["text"])
+                    elif block.get("type") == "image":
+                        st.caption("🖼️ [已上传截图]")
+
+    uploads = st.file_uploader(
+        "上传截图（可多张，TradingView/持仓/交易记录）",
+        type=["png", "jpg", "jpeg", "webp", "gif"],
+        accept_multiple_files=True,
+    )
+
+    prompt = st.chat_input("例如：现在可以追 call 吗？止损放哪？帮我复盘今天。")
+    if not prompt:
+        return
+
+    # Build the user content blocks: images first, then the text question.
+    content = [trading_review.image_block(f) for f in (uploads or [])]
+    content.append({"type": "text", "text": prompt})
+    user_msg = {"role": "user", "content": content if len(content) > 1 else prompt}
+    st.session_state.tr_messages.append(user_msg)
+
+    with st.chat_message("user"):
+        if uploads:
+            st.image([f for f in uploads], width=220)
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
+        try:
+            reply = trading_review.stream_reply(
+                client,
+                mode,
+                st.session_state.tr_messages,
+                lambda text: placeholder.markdown(text),
+            )
+        except Exception as e:  # surface API errors instead of a blank reply
+            placeholder.error(f"调用 Claude API 失败：{e}")
+            st.session_state.tr_messages.pop()  # don't poison history with a failed turn
+            return
+
+    st.session_state.tr_messages.append({"role": "assistant", "content": reply})
+
 
 if __name__ == "__main__":
     main()
