@@ -6,11 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
-import shap
-import mlflow
-import mlflow.sklearn
+# Heavy/optional deps (ydata-profiling, shap, mlflow) are imported lazily inside
+# the pages that use them, so the app boots fast even before they're installed.
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, Ridge
@@ -93,6 +90,8 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
         with tab_profile:
             st.subheader("Automated Data Profile")
             if st.button("Generate Profile Report"):
+                from ydata_profiling import ProfileReport
+                from streamlit_pandas_profiling import st_profile_report
                 profile = ProfileReport(df, title="MSFT Profile Report", explorative=True, minimal=True)
                 st_profile_report(profile)
                 html = profile.to_html()
@@ -141,6 +140,7 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
 
     elif page == "4️⃣ Explainability":
         st.header("4️⃣ Explainable AI with SHAP")
+        import shap
         df2 = df.dropna().copy()
         features_exp = st.multiselect("Features for Explanation", list(df2.columns.drop("Date")), default=["Open", "High", "Low", "Volume"])
         target_exp = st.selectbox("Select Target for Explanation", list(df2.columns.drop("Date")), index=list(df2.columns.drop("Date")).index("Close"))
@@ -163,6 +163,8 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
 
     elif page == "5️⃣ Hyperparameter Tuning":
         st.header("5️⃣ Hyperparameter Tuning & Tracking with MLflow")
+        import mlflow
+        import mlflow.sklearn
         df2 = df.dropna().copy()
         features_ht = ["Open", "High", "Low", "Volume"]
         target_ht = "Close"
