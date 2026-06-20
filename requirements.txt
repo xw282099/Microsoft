@@ -3,9 +3,10 @@ pandas
 numpy
 matplotlib
 seaborn
-ydata-profiling
-streamlit-pandas-profiling
+scikit-learn
 shap
 mlflow
-scikit-learn
 anthropic
+# Optional (heavy; omitted for a clean cloud deploy). Add this back to enable
+# the "Generate Profile Report" button on the Data Visualization page:
+# ydata-profiling

@@ -90,12 +90,19 @@ Enhances data-driven decision-making, potentially improving portfolio performanc
         with tab_profile:
             st.subheader("Automated Data Profile")
             if st.button("Generate Profile Report"):
-                from ydata_profiling import ProfileReport
-                from streamlit_pandas_profiling import st_profile_report
-                profile = ProfileReport(df, title="MSFT Profile Report", explorative=True, minimal=True)
-                st_profile_report(profile)
-                html = profile.to_html()
-                st.download_button("📥 Download Full HTML Report", html, "msft_profile.html", "text/html")
+                try:
+                    from ydata_profiling import ProfileReport
+                    import streamlit.components.v1 as components
+                except ImportError:
+                    st.info(
+                        "Profiling is optional and not enabled in this deployment. "
+                        "Add `ydata-profiling` to requirements.txt to turn it on."
+                    )
+                else:
+                    profile = ProfileReport(df, title="MSFT Profile Report", explorative=True, minimal=True)
+                    html = profile.to_html()
+                    components.html(html, height=800, scrolling=True)
+                    st.download_button("📥 Download Full HTML Report", html, "msft_profile.html", "text/html")
 
     elif page == "3️⃣ Prediction":
         st.header("3️⃣ Prediction: Compare Models")
